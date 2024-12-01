@@ -3,8 +3,9 @@
 " Maintainer:	Tom Picton <tom@tompicton.com>
 " Previous Maintainer: James Sully <sullyj3@gmail.com>
 " Previous Maintainer: Johannes Zellner <johannes@zellner.org>
-" Last Change:	2024/05/13
-" https://github.com/tpict/vim-ftplugin-python
+" Repository: https://github.com/tpict/vim-ftplugin-python
+" Last Change: 2024/05/13
+"              2024 Dec 01 use pytest compiler (#16130)
 
 if exists("b:did_ftplugin") | finish | endif
 let b:did_ftplugin = 1
@@ -134,6 +135,11 @@ elseif executable('python')
   setlocal keywordprg=python\ -m\ pydoc
 endif
 
+if expand('%:t') =~# '\v^test_.*\.py$|_test\.py$' && executable('pytest')
+  compiler pytest
+  let &l:makeprg .= ' %:S'
+endif
+
 " Script for filetype switching to undo the local stuff we may have changed
 let b:undo_ftplugin = 'setlocal cinkeys<'
       \ . '|setlocal comments<'
@@ -188,6 +194,10 @@ let b:undo_ftplugin = 'setlocal cinkeys<'
       \ . '|unlet! b:prev_endtoplevel'
       \ . '|unlet! b:prev_toplevel'
       \ . '|unlet! b:undo_ftplugin'
+
+if get(b:, 'current_compiler', '') ==# 'pytest'
+	let b:undo_ftplugin .= '| compiler make'
+endif
 
 let &cpo = s:keepcpo
 unlet s:keepcpo

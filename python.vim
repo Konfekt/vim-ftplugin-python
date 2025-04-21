@@ -135,7 +135,7 @@ elseif executable('python')
   setlocal keywordprg=python\ -m\ pydoc
 endif
 
-if expand('%:t') =~# '\v^test_.*\.py$|_test\.py$' && executable('pytest')
+if expand('%:t') =~# get(g:, python_files, '\v^test_.*\.py$|_test\.py$') && executable('pytest')
   compiler pytest
   let &l:makeprg .= ' %:S'
 endif
